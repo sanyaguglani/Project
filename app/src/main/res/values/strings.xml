@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">SportIt</string>
+
+    <string-array name="sports_array">
+        <item>Basketball</item>
+        <item>Cricket</item>
+        <item>Football</item>
+        <item>Tennis</item>
+        <item>Baseball</item>
+        <item>Volleyball</item>
+        <item>Badminton</item>
+        <item>Hockey</item>
+    </string-array>
+
+
+</resources>

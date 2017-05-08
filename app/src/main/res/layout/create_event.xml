@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/txtName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_margin="20dp"
+        android:text="Event Name"
+        />
+
+    <EditText
+        android:id="@+id/editName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/txtName"
+        android:layout_alignParentRight="true"
+        android:layout_margin="20dp"
+        android:hint="Enter Event Name"
+
+        />
+
+    <TextView
+        android:id="@+id/txtSport"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtName"
+        android:layout_margin="20dp"
+        android:text="Select Sport"
+        />
+
+    <Spinner
+        android:id="@+id/sports_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/txtSport"
+        android:layout_alignRight="@+id/editName"
+        android:layout_alignEnd="@+id/editName"
+        android:layout_alignLeft="@+id/editTime"
+        android:layout_alignStart="@+id/editTime"
+        android:layout_below="@+id/editName" />
+
+    <TextView
+        android:id="@+id/txtDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:text="When"
+        android:layout_below="@+id/txtSport"/>
+
+   <EditText
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:id="@+id/editDate"
+       android:focusable="false"
+       android:layout_alignBaseline="@+id/txtDate"
+       android:layout_alignBottom="@+id/txtDate"
+       android:layout_alignRight="@+id/editLoc"
+       android:layout_alignEnd="@+id/editLoc"
+       android:layout_toRightOf="@+id/createEvent"
+       android:layout_toEndOf="@+id/createEvent" />
+
+    <TextView
+        android:id="@+id/txtLoc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:text="Where"
+        android:layout_below="@+id/txtDate"
+        />
+
+    <EditText
+        android:id="@+id/editLoc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Enter Event Location"
+        android:layout_alignBottom="@+id/txtLoc"
+        android:layout_alignRight="@+id/editName"
+        android:layout_alignEnd="@+id/editName"
+        android:layout_alignBaseline="@+id/txtLoc"/>
+
+    <TextView
+        android:id="@+id/txtTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:text="Time"
+        android:layout_below="@+id/txtLoc"
+        />
+
+    <EditText
+        android:id="@+id/editTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Enter Event Time"
+        android:layout_alignBaseline="@+id/txtTime"
+        android:layout_alignBottom="@+id/txtTime"
+        android:layout_alignRight="@+id/editLoc"
+        android:layout_alignEnd="@+id/editLoc" />
+
+    <TextView
+        android:id="@+id/txtPlayerNo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtTime"
+        android:layout_margin="20dp"
+        android:text="Number of Players"
+        />
+
+    <EditText
+        android:id="@+id/editPlayerNo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Enter no of players required"
+        android:layout_above="@+id/txtOther"
+        android:layout_toRightOf="@+id/txtOther"
+        android:layout_toEndOf="@+id/txtOther" />
+
+    <TextView
+        android:id="@+id/txtOther"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtPlayerNo"
+        android:layout_margin="20dp"
+        android:text="Other Information"
+        />
+
+    <EditText
+        android:id="@+id/editOther"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Enter other additional info"
+        android:layout_below="@+id/editPlayerNo"
+        android:layout_alignRight="@+id/editPlayerNo"
+        android:layout_alignEnd="@+id/editPlayerNo" />
+
+<Button
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/createEventButton"
+    android:text="Create Event"
+    android:layout_alignParentBottom="true"
+    android:layout_centerInParent="true"/>
+
+</RelativeLayout>

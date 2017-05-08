@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.android.sportit.ConfirmEvent">
+
+
+    <TextView
+        android:id="@+id/txtName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Event Name"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="11dp"
+        android:layout_below="@+id/editName"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="16dp" />
+
+    <EditText
+        android:id="@+id/editName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/txtName"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp" />
+
+    <TextView
+        android:id="@+id/txtSport"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sport"
+        android:layout_below="@+id/txtName"
+        android:layout_alignLeft="@+id/txtName"
+        android:layout_alignStart="@+id/txtName"
+        android:layout_marginTop="10dp" />
+
+    <EditText
+        android:id="@+id/editSport"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/txtSport"
+        android:layout_alignParentRight="true"
+        android:layout_alignBaseline="@+id/txtSport"
+        android:layout_below="@+id/editName"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp" />
+
+    <TextView
+        android:id="@+id/txtDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="When"
+        android:layout_below="@+id/editSport"
+        android:layout_alignLeft="@+id/txtSport"
+        android:layout_alignStart="@+id/txtSport" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/editDate"
+        android:focusable="false"
+        android:layout_alignBaseline="@+id/txtDate"
+        android:layout_alignBottom="@+id/txtDate"
+        android:layout_alignRight="@+id/editLoc"
+        android:layout_alignEnd="@+id/editLoc"
+        android:layout_toRightOf="@+id/createEvent"
+        android:layout_toEndOf="@+id/createEvent" />
+
+    <TextView
+        android:id="@+id/txtLoc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Location"
+        android:layout_below="@+id/txtDate"
+        android:layout_alignLeft="@+id/txtDate"
+        android:layout_alignStart="@+id/txtDate"
+        android:layout_marginTop="18dp" />
+
+    <EditText
+        android:id="@+id/editLoc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/txtLoc"
+        android:layout_alignRight="@+id/editName"
+        android:layout_alignEnd="@+id/editName"
+        android:layout_alignBaseline="@+id/txtLoc"/>
+
+    <TextView
+        android:id="@+id/txtTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Time"
+        android:layout_below="@+id/txtLoc"
+        android:layout_alignRight="@+id/txtDate"
+        android:layout_alignEnd="@+id/txtDate"
+        android:layout_marginTop="25dp" />
+
+    <EditText
+        android:id="@+id/editTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/txtTime"
+        android:layout_alignBottom="@+id/txtTime"
+        android:layout_alignRight="@+id/editLoc"
+        android:layout_alignEnd="@+id/editLoc" />
+
+    <TextView
+        android:id="@+id/txtPlayerNo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Number of Players"
+        android:layout_below="@+id/txtTime"
+        android:layout_alignLeft="@+id/txtLoc"
+        android:layout_alignStart="@+id/txtLoc"
+        android:layout_marginTop="28dp" />
+
+    <EditText
+        android:id="@+id/editPlayerNo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtTime"
+        android:layout_alignLeft="@+id/editOther"
+        android:layout_alignStart="@+id/editOther" />
+
+    <TextView
+        android:id="@+id/txtOther"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Other Information"
+        android:layout_below="@+id/txtPlayerNo"
+        android:layout_alignLeft="@+id/txtPlayerNo"
+        android:layout_alignStart="@+id/txtPlayerNo"
+        android:layout_marginTop="14dp" />
+
+    <EditText
+        android:id="@+id/editOther"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/editPlayerNo"
+        android:layout_alignLeft="@+id/editTime"
+        android:layout_alignStart="@+id/editTime" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/shareButton"
+        android:text="Share with Friends"
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"/>
+
+    <Button
+        android:id="@+id/editButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Edit"
+        android:layout_alignParentTop="true"
+        android:layout_alignRight="@+id/shareButton"
+        android:layout_alignEnd="@+id/shareButton" />
+
+    <Button
+        android:id="@+id/deleteButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Delete"
+        android:layout_alignParentTop="true"
+       android:layout_alignParentRight="true" />
+
+
+</RelativeLayout>
