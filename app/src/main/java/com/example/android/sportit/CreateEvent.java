@@ -62,7 +62,7 @@ public class CreateEvent extends AppCompatActivity implements AdapterView.OnItem
         myCalendar= Calendar.getInstance();
         dateEdit = (EditText) findViewById(R.id.editDate);
 
-
+        ievent = new Intent(this,ConfirmEvent.class);
 
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,

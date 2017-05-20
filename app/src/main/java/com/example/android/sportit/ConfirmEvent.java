@@ -81,6 +81,8 @@ public class ConfirmEvent extends AppCompatActivity {
 
                 // for editing event
                 ievent.putExtra("event", created_event);
+                //startActvity
+
                 setContentView(R.layout.edit_event);
             }
         });

@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
         viewEvent.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                setContentView(R.layout.create_event);
+                setContentView(R.layout.view_attending_events);  //create event
             }
         });
 
