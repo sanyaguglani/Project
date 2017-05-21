@@ -16,15 +16,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".CreateEvent"
-            android:label="Create Event"
-            />
-        <activity android:name=".ConfirmEvent"
-            android:label="Event Created"
-            />
-        <activity android:name=".EditEvent"
-            android:label="Edit Event"
-            />
         <activity android:name=".AttendingEvents"
             android:label="Attending Events"
             />

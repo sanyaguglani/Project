@@ -59,8 +59,8 @@ public class EventAdapter extends ArrayAdapter<Event> {
         }
         // Assign values to the TextViews using the Monster object
         viewHolder.vEventName.setText(eventList.get(position).getEventName());
-        viewHolder.vEventPlace.setText(eventList.get(position).getEventLocation());
-        viewHolder.vEvenDate.setText(eventList.get(position).getEventDate().concat(" ").concat(eventList.get(position).getEventTime()));
+        viewHolder.vEventPlace.setText(eventList.get(position).getPlace());
+        viewHolder.vEvenDate.setText(eventList.get(position).getDate().concat(" ").concat(eventList.get(position).getTime()));
         return convertView;
     }
 
