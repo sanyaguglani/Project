@@ -1,4 +1,4 @@
-package com.example.android.sportit;
+package com.example.android.sportit.Adapter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.example.android.sportit.Models.Event;
+import com.example.android.sportit.R;
 
 import java.util.ArrayList;
 
@@ -30,7 +31,9 @@ public class EventAdapter extends ArrayAdapter<Event> {
     }
 
     public static class ViewHolder {
-        TextView eventName;
+        TextView vEventName;
+        TextView vEventPlace;
+        TextView vEvenDate;
     }
 
 
@@ -45,7 +48,9 @@ public class EventAdapter extends ArrayAdapter<Event> {
 
             // Setup ViewHolder and attach to view
             viewHolder = new ViewHolder();
-            viewHolder.eventName = (TextView) convertView.findViewById(R.id.eventListName);
+            viewHolder.vEventName = (TextView) convertView.findViewById(R.id.event_name);
+            viewHolder.vEventPlace = (TextView) convertView.findViewById(R.id.event_place);
+            viewHolder.vEvenDate = (TextView) convertView.findViewById(R.id.event_date);
             convertView.setTag(viewHolder);
         }
         else {
@@ -53,7 +58,9 @@ public class EventAdapter extends ArrayAdapter<Event> {
             viewHolder= (ViewHolder) convertView.getTag();
         }
         // Assign values to the TextViews using the Monster object
-        viewHolder.eventName.setText(eventList.get(position).getEventName());
+        viewHolder.vEventName.setText(eventList.get(position).getEventName());
+        viewHolder.vEventPlace.setText(eventList.get(position).getEventLocation());
+        viewHolder.vEvenDate.setText(eventList.get(position).getEventDate().concat(" ").concat(eventList.get(position).getEventTime()));
         return convertView;
     }
 

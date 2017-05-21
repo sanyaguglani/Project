@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "95608195732",
+    "firebase_url": "https://sportit-e895a.firebaseio.com",
+    "project_id": "sportit-e895a",
+    "storage_bucket": "sportit-e895a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:95608195732:android:2e48a927059c08c8",
+        "android_client_info": {
+          "package_name": "com.example.android.sportit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "95608195732-4d1jjda8743vvu0lrl3ld1vjd9jtcm01.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.android.sportit",
+            "certificate_hash": "2d7b4eadf5ca0e6ac3a071f225b8b4207f054811"
+          }
+        },
+        {
+          "client_id": "95608195732-of9j97uf7po3mvh8snkd90rd606iq7eh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8IaHz0n9OVfX8ZMCt46TQHglT2jG8r2M"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "95608195732-of9j97uf7po3mvh8snkd90rd606iq7eh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

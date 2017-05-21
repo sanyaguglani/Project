@@ -32,7 +32,7 @@ public class ConfirmEvent extends AppCompatActivity {
     Button edit;
     Button delete;
 
-    Event created_event = new Event();
+    Event created_event = new Event("Football Match","Monash Caulfield Ground","20-May-2017", "5:00pm");
 
     Intent ievent;
 

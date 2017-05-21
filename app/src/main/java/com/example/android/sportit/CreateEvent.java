@@ -35,7 +35,7 @@ public class CreateEvent extends AppCompatActivity implements AdapterView.OnItem
     EditText info;
     Button createEvent;
 
-    Event event = new Event();
+    Event event = new Event("Football Match","Monash Caulfield Ground","20-May-2017", "5:00pm");
 
     EditText dateEdit;
     Spinner spinner;

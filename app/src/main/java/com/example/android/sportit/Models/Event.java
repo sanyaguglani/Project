@@ -18,22 +18,23 @@ public class Event implements Parcelable {
     //Event Class attributes
     private String eventName;
     private String eventSport;
-    private Date eventDate;
+    private String eventDate;
     private String eventLocation;
     private String eventTime;               // Event Time is string
     private int eventPlayers;
     private String eventInfo;
+    private String createdBy;
 
 
-    public Event()     // default values constructor
-    {
+    public Event(String eventName, String place, String date, String time){
+        this.eventName = eventName;
+        this.eventLocation = place;
+        this.eventDate = date;
+        this.eventTime = time;
+    };
 
-        eventName = "Cricket Match";
-        eventSport = "Cricket";
 
-    }
-
-    public Event(String eventName, String eventSport, Date eventDate, String eventLocation,
+    public Event(String eventName, String eventSport, String eventDate, String eventLocation,
                  String eventTime, int eventPlayers, String eventInfo) //Parameterised Constructor
     {
         this.eventName = eventName;
@@ -103,11 +104,11 @@ public class Event implements Parcelable {
         this.eventSport = eventSport;
     }
 
-    public Date getEventDate() {            //Accessor For Event Date
+    public String getEventDate() {            //Accessor For Event Date
         return eventDate;
     }
 
-    public void setEventDate(Date eventDate) {      //Mutator For Event Date
+    public void setEventDate(String eventDate) {      //Mutator For Event Date
         this.eventDate = eventDate;
     }
 
@@ -143,5 +144,12 @@ public class Event implements Parcelable {
         this.eventInfo = eventInfo;
     }
 
+    public String getCreatedBy() {      //Accessor For Event Info
+        return createdBy;
+    }
+
+    public void setCreatedBy(String creator) {        //Mutator For Event Info
+        this.createdBy = creator;
+    }
 
 }

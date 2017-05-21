@@ -6,25 +6,24 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ListView;
 
-import com.example.android.sportit.Fragments.AttendingEventsFrag;
+import com.example.android.sportit.Fragments.ViewAllEventsFrag;
 import com.example.android.sportit.Models.Event;
 
 import java.util.ArrayList;
 
 /**
- * Created by Sanya on 21/05/2017.
+ * Created by Sanya on 18/05/2017.
  */
 
-public class AttendingEvents extends AppCompatActivity  {
+public class ViewAllEvents extends AppCompatActivity{
 
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_container);
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container, new AttendingEventsFrag())
+                .replace(R.id.container, new ViewAllEventsFrag())
                 .commit();
-
     }
 }
