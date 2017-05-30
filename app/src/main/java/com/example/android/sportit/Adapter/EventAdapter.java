@@ -1,8 +1,6 @@
 package com.example.android.sportit.Adapter;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +31,7 @@ public class EventAdapter extends ArrayAdapter<Event> {
     public static class ViewHolder {
         TextView vEventName;
         TextView vEventPlace;
-        TextView vEvenDate;
+        TextView vEventDate;
     }
 
 
@@ -50,17 +48,34 @@ public class EventAdapter extends ArrayAdapter<Event> {
             viewHolder = new ViewHolder();
             viewHolder.vEventName = (TextView) convertView.findViewById(R.id.event_name);
             viewHolder.vEventPlace = (TextView) convertView.findViewById(R.id.event_place);
-            viewHolder.vEvenDate = (TextView) convertView.findViewById(R.id.event_date);
+            viewHolder.vEventDate = (TextView) convertView.findViewById(R.id.event_date);
             convertView.setTag(viewHolder);
         }
         else {
             // View has already been created, fetch our ViewHolder
             viewHolder= (ViewHolder) convertView.getTag();
         }
-        // Assign values to the TextViews using the Monster object
-        viewHolder.vEventName.setText(eventList.get(position).getEventName());
-        viewHolder.vEventPlace.setText(eventList.get(position).getPlace());
-        viewHolder.vEvenDate.setText(eventList.get(position).getDate().concat(" ").concat(eventList.get(position).getTime()));
+
+        Event currentEvent = getItem(position);
+
+//        // Assign values to the TextViews using the Monster object
+//        viewHolder.vEventName.setText(eventList.get(position).getEventName());
+//        viewHolder.vEventPlace.setText(eventList.get(position).getPlace());
+//        viewHolder.vEvenDate.setText(eventList.get(position).getDate().concat(" ").concat(eventList.get(position).getTime()));
+
+        if (currentEvent.getIsCancelled()) {
+            viewHolder.vEventName.setText(currentEvent.getEventName() + " - CANCELLED");
+        }else{
+            viewHolder.vEventName.setText(currentEvent.getEventName());
+        }
+        if (currentEvent.getPlace().indexOf('|') != -1) {
+            viewHolder.vEventPlace.setText(currentEvent.getPlace().substring(0, currentEvent.getPlace().indexOf('|')));
+        }else{
+            viewHolder.vEventPlace.setText(currentEvent.getPlace());
+        }
+        String dateTime = currentEvent.getDate() + ", " + currentEvent.getTime();
+        viewHolder.vEventDate.setText(dateTime);
+
         return convertView;
     }
 

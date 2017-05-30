@@ -5,16 +5,23 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.android.sportit.Adapter.EventAdapter;
-import com.example.android.sportit.EventDetails;
+import com.example.android.sportit.Activities.EventDetails;
 import com.example.android.sportit.Models.Event;
 import com.example.android.sportit.R;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -28,6 +35,14 @@ public class ViewAllEventsFrag extends Fragment {
     private ListView listView;
     private EventAdapter eventAdapter;
     private View rootView;
+    private TextView empty;
+    private View loadingIndicator;
+    private ArrayList<String> eventId;
+    private FirebaseDatabase firebaseDatabase;
+    private DatabaseReference databaseReferenceEvents;
+    private ValueEventListener valueEventListener;
+    private ValueEventListener valueEventListener2;
+    private DatabaseReference databaseReferenceUsers;
 
     public ViewAllEventsFrag() {
         // Required empty public constructor
@@ -38,28 +53,90 @@ public class ViewAllEventsFrag extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-       rootView = inflater.inflate(R.layout.list_layout, container, false);
+        rootView = inflater.inflate(R.layout.list_layout, container, false);
 
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        databaseReferenceEvents  = firebaseDatabase.getReference().child("events");
+        databaseReferenceUsers = firebaseDatabase.getReference().child("users").child("RMBIva5WdIZyE7zcTbcQ8SPAGlZ2").child("eventsAttending");
 
         fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
         fab.setVisibility(View.GONE);
 
-        event = new ArrayList<Event>();
+        empty = (TextView) rootView.findViewById(R.id.empty_view) ;
 
-        event.add(0,new Event("Football Match","Monash Caulfield Ground","20-May-2017", "5:00PM"));
-        event.add(1,new Event("Badminton Match", "Oakleigh Ground", "10 May 2017", "10:30AM"));
-        event.add(2,new Event("Cricket Match","Monash Clayton","20-Jul-2017","6:00PM"));
-        event.add(3,new Event("Rugby Match", "RMIT Ground", "18 May 2017", "09:30AM"));
+        event = new ArrayList<Event>();
+        eventId = new ArrayList<String>();
+
+
+//        event.add(0,new Event("Football Match","Monash Caulfield Ground","20-May-2017", "5:00PM"));
+//        event.add(1,new Event("Badminton Match", "Oakleigh Ground", "10 May 2017", "10:30AM"));
+//        event.add(2,new Event("Cricket Match","Monash Clayton","20-Jul-2017","6:00PM"));
+//        event.add(3,new Event("Rugby Match", "RMIT Ground", "18 May 2017", "09:30AM"));
 
         eventAdapter = new EventAdapter(getActivity(), event);
+        loadingIndicator = rootView.findViewById(R.id.loading_indicator);
 
         listView = (ListView) rootView.findViewById(R.id.list);
         listView.setAdapter(eventAdapter);
 
+
+        valueEventListener2 = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                eventId.clear();
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()){
+                    Log.v("event id", "ids from users : "+postSnapshot.getKey());
+                    eventId.add(postSnapshot.getKey());
+                }
+
+                databaseReferenceEvents.addValueEventListener(valueEventListener);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+
+        };
+
+        valueEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                eventAdapter.clear();
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                    Event e = postSnapshot.getValue(Event.class);
+                    if (!e.getCreatedBy().contentEquals("RMBIva5WdIZyE7zcTbcQ8SPAGlZ2") &&
+                            !eventId.contains(postSnapshot.getKey()) && !e.getIsCancelled()) {
+                        e.setEventID(postSnapshot.getKey());
+                        event.add(e);
+                        eventAdapter.notifyDataSetChanged();
+                        loadingIndicator.setVisibility(View.GONE);
+                        empty.setVisibility(View.GONE);
+                    }
+                }
+                if (eventAdapter.isEmpty()){
+                    loadingIndicator.setVisibility(View.GONE);
+                    empty.setText("No Events Available");
+                    empty.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+
+        databaseReferenceUsers.addValueEventListener(valueEventListener2);
+
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Event e = event.get(position);
                 Intent intent = new Intent(getContext(), EventDetails.class);
+                intent.putExtra("EventID",e.getEventID());
                 intent.putExtra("Caller Method","view all events");
                 startActivity(intent);
             }
@@ -67,5 +144,13 @@ public class ViewAllEventsFrag extends Fragment {
 
         return rootView;
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        eventAdapter.clear();
+        databaseReferenceEvents.removeEventListener(valueEventListener);
+    }
+
 
 }

@@ -18,12 +18,12 @@ public class Event {
     public Event()
     {}
 
-    public Event(String eventName, String place, String date, String time){   // Dummy
-        this.eventName = eventName;
-        this.place = place;
-        this.date = date;
-        this.time = time;
-    }
+//    public Event(String eventName, String place, String date, String time){   // Dummy
+//        this.eventName = eventName;
+//        this.place = place;
+//        this.date = date;
+//        this.time = time;
+//    }
 
 
     public Event(String eventName, String place, String date, String time, String createdBy, int playersRequired){
@@ -34,7 +34,9 @@ public class Event {
         this.createdBy = createdBy;
         this.playersRequired = playersRequired;
         this.playersAttending = 0;
-    }
+        this.isCancelled = false;
+    };
+
 
     private String eventName;
 
@@ -51,6 +53,12 @@ public class Event {
     private int playersRequired;
 
     private int playersAttending;
+
+    private boolean isCancelled;
+
+
+    //getter setter for all attributes?
+
 
     public String getEventName(){
         return eventName;
@@ -87,4 +95,6 @@ public class Event {
     public int getPlayersAttending(){
         return playersAttending;
     }
+
+    public boolean getIsCancelled(){ return isCancelled; }
 }

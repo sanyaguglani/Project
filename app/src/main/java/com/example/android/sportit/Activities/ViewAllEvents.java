@@ -1,16 +1,9 @@
-package com.example.android.sportit;
+package com.example.android.sportit.Activities;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.widget.ListView;
-
 import com.example.android.sportit.Fragments.ViewAllEventsFrag;
-import com.example.android.sportit.Models.Event;
-
-import java.util.ArrayList;
-
+import com.example.android.sportit.R;
 /**
  * Created by Sanya on 18/05/2017.
  */

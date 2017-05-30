@@ -1,23 +1,11 @@
 <resources>
-    <string name="app_name">SportIt</string>
-
-    <string-array name="sports_array">
-        <item>Basketball</item>
-        <item>Cricket</item>
-        <item>Football</item>
-        <item>Tennis</item>
-        <item>Baseball</item>
-        <item>Volleyball</item>
-        <item>Badminton</item>
-        <item>Hockey</item>
-    </string-array>
-
+    <string name="app_name">Sport It</string>
 
     <!--Category name for myEvents -->
-    <string name="category_myEvents">Created</string>
+    <string name="category_myEvents">My Events</string>
 
     <!--Category name for View All Events -->
-    <string name="category_viewAll">View All</string>
+    <string name="category_viewAll">All Events</string>
 
     <!--Category name for Attending -->
     <string name="category_attending">Attending</string>
@@ -29,13 +17,13 @@
     <string name="label_eventName">Event Name</string>
 
     <!--Label for Date -->
-    <string name="label_eventDate">Date</string>
+    <string name="label_eventDate">Event Date</string>
 
     <!--Label for Time -->
-    <string name="label_eventTime">Time</string>
+    <string name="label_eventTime">Event Time</string>
 
     <!--Label for Place -->
-    <string name="label_eventPlace">Place</string>
+    <string name="label_eventPlace">Event Place</string>
 
     <!--Label for Players Required -->
     <string name="label_playersRequired">Players Required</string>
@@ -43,11 +31,16 @@
     <!--Label for Players Attending -->
     <string name="label_playersAttending">Players Attending</string>
 
-    <!-- Label for editor menu option to save event and leave editor -->
+    <!-- Label for editor menu option to save event -->
     <string name="action_save">Save</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- Label for editor menu option to edit event -->
+    <string name="action_edit">Edit</string>
 
+    <!-- Label for editor menu option to delete event -->
+    <string name="action_delete">Delete</string>
+
+    <!-- Label for editor menu option to delete event -->
+    <string name="search_title">Search...</string>
 
 </resources>

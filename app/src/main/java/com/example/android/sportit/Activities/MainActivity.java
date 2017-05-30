@@ -1,14 +1,12 @@
-package com.example.android.sportit;
+package com.example.android.sportit.Activities;
 
-import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
 
 import com.example.android.sportit.Adapter.FixTabPages;
+import com.example.android.sportit.R;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,16 +19,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Find the view pager that will allow the user to swipe between fragments
+        // View pager that will allow the user to swipe between fragments
         viewPager = (ViewPager) findViewById(R.id.viewpager);
 
-        // Create an adapter that knows which fragment should be shown on each page
+        // Adapter that knows which fragment should be shown on each page
         adapter = new FixTabPages(this,getSupportFragmentManager());
 
         // Set the adapter onto the view pager
         viewPager.setAdapter(adapter);
 
-        // Find the tab layout that shows the tabs
+        // Tab layout to shows the tabs
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
 
