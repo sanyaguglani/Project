@@ -16,7 +16,10 @@
     <!--Label for Create Event -->
     <string name="label_eventName">Event Name</string>
 
-    <!--Label for Date -->
+    <!--Label for Event Sport Name  -->
+    <string name="label_sportName">Event Sport</string>
+
+       <!--Label for Date -->
     <string name="label_eventDate">Event Date</string>
 
     <!--Label for Time -->
@@ -42,5 +45,17 @@
 
     <!-- Label for editor menu option to delete event -->
     <string name="search_title">Search...</string>
+
+    <!-- Label for event sport option to select event -->
+    <string-array name="sports_array">
+        <item>Cricket</item>
+        <item>Football</item>
+        <item>Tennis</item>
+        <item>Badminton</item>
+        <item>Hockey</item>
+        <item>Soccer</item>
+        <item>Basketball</item>
+        <item>Baseball</item>
+    </string-array>
 
 </resources>

@@ -7,6 +7,9 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -15,8 +18,10 @@ import android.widget.TextView;
 
 import com.example.android.sportit.Adapter.EventAdapter;
 import com.example.android.sportit.Activities.EventDetails;
+import android.support.v7.widget.SearchView;
 import com.example.android.sportit.Models.Event;
 import com.example.android.sportit.R;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -39,6 +44,7 @@ public class ViewAllEventsFrag extends Fragment {
     private View loadingIndicator;
     private ArrayList<String> eventId;
     private FirebaseDatabase firebaseDatabase;
+    private FirebaseAuth firebaseAuth;
     private DatabaseReference databaseReferenceEvents;
     private ValueEventListener valueEventListener;
     private ValueEventListener valueEventListener2;
@@ -56,8 +62,9 @@ public class ViewAllEventsFrag extends Fragment {
         rootView = inflater.inflate(R.layout.list_layout, container, false);
 
         firebaseDatabase = FirebaseDatabase.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
         databaseReferenceEvents  = firebaseDatabase.getReference().child("events");
-        databaseReferenceUsers = firebaseDatabase.getReference().child("users").child("RMBIva5WdIZyE7zcTbcQ8SPAGlZ2").child("eventsAttending");
+        databaseReferenceUsers = firebaseDatabase.getReference().child("users").child(firebaseAuth.getCurrentUser().getUid()).child("eventsAttending");
 
         fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
         fab.setVisibility(View.GONE);
@@ -106,7 +113,7 @@ public class ViewAllEventsFrag extends Fragment {
                 eventAdapter.clear();
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                     Event e = postSnapshot.getValue(Event.class);
-                    if (!e.getCreatedBy().contentEquals("RMBIva5WdIZyE7zcTbcQ8SPAGlZ2") &&
+                    if (!e.getCreatedBy().contentEquals(firebaseAuth.getCurrentUser().getUid()) &&
                             !eventId.contains(postSnapshot.getKey()) && !e.getIsCancelled()) {
                         e.setEventID(postSnapshot.getKey());
                         event.add(e);
@@ -146,10 +153,42 @@ public class ViewAllEventsFrag extends Fragment {
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // TODO Add your menu entries here
+        //super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.search_menu,menu);
+        MenuItem item = menu.findItem(R.id.search);
+
+        SearchView searchView = (SearchView)item.getActionView();
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                eventAdapter.getFilter().filter(newText);
+                return false;
+            }
+        });
+
+    }
+
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         eventAdapter.clear();
         databaseReferenceEvents.removeEventListener(valueEventListener);
+        databaseReferenceEvents.removeEventListener(valueEventListener2);
     }
 
 

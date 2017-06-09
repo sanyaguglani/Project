@@ -1,5 +1,7 @@
 package com.example.android.sportit.Activities;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,8 +10,25 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TimePicker;
+import android.widget.Toast;
+
+import java.io.Console;
+import java.sql.Time;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TimeZone;
 
 import com.example.android.sportit.Models.Event;
 import com.example.android.sportit.R;
@@ -18,15 +37,13 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.*;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
 
 /**
  * Created by Sanya on 19/05/2017.
@@ -43,20 +60,29 @@ public class EventDetails extends AppCompatActivity {
     private Button button1;      //For Join/Withdraw/Save Button
     private Button button2;      // For share button
     private Button placePickerButton;   // To select location
+    private java.util.Calendar cal;
+    int eventYear, eventMonth, eventDay;
+    int hour;
+    int min;
+    private String[] localDateTime;
+
 
     private String previousActivity;        // For picking previous activity name from intent
 
     private String eventID;
     private Event e;
 
+    private String sport;
     private String location;
     private Double lat;
     private Double lon;
     private String[] loc;
     int PLACE_PICKER_REQUEST = 1;
+    private static String timeZoneID;
 
     private ValueEventListener valueEventListener;
     private FirebaseDatabase firebaseDatabase;
+    private FirebaseAuth firebaseAuth;
     private DatabaseReference databaseReference;
 
     @Override
@@ -65,7 +91,24 @@ public class EventDetails extends AppCompatActivity {
         setContentView(R.layout.event_details_layout);      //Initialise the UI layout file
 
         firebaseDatabase = FirebaseDatabase.getInstance();     //Instantiate the Firebase reference
+        firebaseAuth = FirebaseAuth.getInstance();
         databaseReference = firebaseDatabase.getReference();
+
+        cal = java.util.Calendar.getInstance();
+        timeZoneID = cal.getTimeZone().getID();
+
+        final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                cal.set(java.util.Calendar.YEAR, year);
+                eventYear = year;
+                cal.set(java.util.Calendar.MONTH,month);
+                eventMonth = month;
+                cal.set(java.util.Calendar.DAY_OF_MONTH, dayOfMonth);
+                eventDay = dayOfMonth;
+                update();
+            }
+        };
 
         //Instantiate UI elements
         eventNameEditText = (EditText) findViewById(R.id.edit_event_name);
@@ -79,6 +122,52 @@ public class EventDetails extends AppCompatActivity {
         button1 = (Button) findViewById(R.id.button1); //UI Button for Join/Withdraw/Save control
         button2 = (Button) findViewById(R.id.button2);  //Share Button
 
+        Spinner spinner = (Spinner) findViewById(R.id.sport_spinner);
+
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.sports_array, android.R.layout.simple_spinner_dropdown_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        spinner.setAdapter(adapter);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // On selecting a spinner item
+                sport = parent.getItemAtPosition(position).toString();
+            }
+            public void onNothingSelected(AdapterView<?> arg0) {
+                // TODO Auto-generated method stub
+            }
+        });
+
+        eventDateEditText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new DatePickerDialog(EventDetails.this, date, cal.get(java.util.Calendar.YEAR), cal.get(java.util.Calendar.MONTH), cal.get(java.util.Calendar.DAY_OF_MONTH)).show();
+            }
+        });
+
+        eventTimeEditText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TimePickerDialog timePickerDialog = new TimePickerDialog(EventDetails.this, new TimePickerDialog.OnTimeSetListener() {
+
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        boolean isPM = (hourOfDay >= 12);
+                        hour = hourOfDay;
+                        min = minute;
+
+                        eventTimeEditText.setText(String.format("%02d:%02d %s", (hourOfDay == 12 || hourOfDay == 0) ? 12 : hourOfDay % 12, minute, isPM ? "PM" : "AM"));
+                    }
+                }, hour, min, false);
+                timePickerDialog.show();
+            }
+        });
+
         Intent intent = getIntent();        //Intent from calling activities
         previousActivity = intent.getStringExtra("Caller Method");  //extracting calling activity name from intent
         eventID = intent.getStringExtra("EventID");
@@ -89,9 +178,12 @@ public class EventDetails extends AppCompatActivity {
                 if (dataSnapshot.hasChildren()) {
                     e = dataSnapshot.getValue(Event.class);     //?? Calling Event attribute methods for each event object
                     eventNameEditText.setText(e.getEventName());      //Setting values to output screen
-                    eventDateEditText.setText(e.getDate());
-                    eventTimeEditText.setText(e.getTime());
+//                    eventDateEditText.setText(e.getDate());
+//                    eventTimeEditText.setText(e.getTime());
                     playersRequiredEditText.setText("" + e.getPlayersRequired());   // ?? int to string?
+                    localDateTime = utcToLocal(e.getDateTime());
+                    eventDateEditText.setText(localDateTime[0]);
+                    eventTimeEditText.setText(localDateTime[1]);
                     location = e.getPlace();    //Get the location
                     loc = location.split("[|]");    // Split location name, latitude and longitude
                     placePickerButton.setText(loc[0]);
@@ -307,8 +399,8 @@ public class EventDetails extends AppCompatActivity {
     }
 
     private void saveEventData(){
-        //String userID = firebaseAuth.getCurrentUser().getUid();
-        String userID = "6ENX5lnih5eGGqvX6rBhhElUkbs2";
+        String userID = firebaseAuth.getCurrentUser().getUid();
+       // String userID = "6ENX5lnih5eGGqvX6rBhhElUkbs2";
         if (!userID.isEmpty()) {
             String eventName = eventNameEditText.getText().toString().trim();
             String eventDate = eventDateEditText.getText().toString().trim();
@@ -316,8 +408,12 @@ public class EventDetails extends AppCompatActivity {
             String eventTime = eventTimeEditText.getText().toString().trim();
             int playersRequired = Integer.parseInt(playersRequiredEditText.getText().toString().trim());
 
+            cal.set(eventYear,eventMonth,eventDay,hour,min);
+            Date date = cal.getTime();
+            String eventDateTime = localToUTC(date);
+
             if ((previousActivity.contentEquals("event add"))) {
-                Event event = new Event(eventName, eventPlace, eventDate, eventTime, userID, playersRequired);
+                Event event = new Event(eventName, eventPlace, eventDateTime, userID, playersRequired);
                 databaseReference.child("events").push().setValue(event);
             }
             else if ((previousActivity.contentEquals("edit event"))){
@@ -340,9 +436,9 @@ public class EventDetails extends AppCompatActivity {
     private void joinEvent(int players){
 
         Map<String,Object> update = new HashMap<>();
-        update.put("events/"+eventID+"/usersAttending/"+"RMBIva5WdIZyE7zcTbcQ8SPAGlZ2",true);
+        update.put("events/"+eventID+"/usersAttending/"+firebaseAuth.getCurrentUser().getUid(),true);
         update.put("events/"+eventID+"/playersAttending",players+1);
-        update.put("users/"+"RMBIva5WdIZyE7zcTbcQ8SPAGlZ2"+"/eventsAttending/"+eventID,true);
+        update.put("users/"+firebaseAuth.getCurrentUser().getUid()+"/eventsAttending/"+eventID,true);
 
         databaseReference.updateChildren(update);   //DB update
     }
@@ -351,8 +447,8 @@ public class EventDetails extends AppCompatActivity {
         Map<String,Object> update = new HashMap<>();
         update.put("events/"+eventID+"/playersAttending",players-1);
         databaseReference.updateChildren(update);
-        databaseReference.child("events").child(eventID).child("usersAttending").child("RMBIva5WdIZyE7zcTbcQ8SPAGlZ2").removeValue();
-        databaseReference.child("users").child("RMBIva5WdIZyE7zcTbcQ8SPAGlZ2").child("eventsAttending").child(eventID).removeValue();
+        databaseReference.child("events").child(eventID).child("usersAttending").child(firebaseAuth.getCurrentUser().getUid()).removeValue();
+        databaseReference.child("users").child(firebaseAuth.getCurrentUser().getUid()).child("eventsAttending").child(eventID).removeValue();
     }
 
     private void deleteEvent(){
@@ -386,6 +482,43 @@ public class EventDetails extends AppCompatActivity {
         eventDateEditText.setEnabled(false);
         eventTimeEditText.setEnabled(false);
         playersRequiredEditText.setEnabled(false);
+    }
+
+    private void update(){
+        SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy");
+        eventDateEditText.setText(sdf.format(cal.getTime()));
+    }
+
+    private static String localToUTC(Date date) {
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy HH:mm");
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return sdf.format(date);
+    }
+
+    private String[] utcToLocal(String date){
+        SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy HH:mm");
+        String[] localDateTime = new String[2];
+        try {
+            Date convertedDate = sdf.parse(date);
+
+            Date local = new Date(convertedDate.getTime() + TimeZone.getTimeZone(timeZoneID).getOffset(convertedDate.getTime()));
+            cal.setTime(local);
+            eventYear = cal.get(Calendar.YEAR);
+            eventMonth = cal.get(Calendar.MONTH);
+            eventDay = cal.get(Calendar.DAY_OF_MONTH);
+            hour = cal.get(Calendar.HOUR_OF_DAY);
+            min = cal.get(Calendar.MINUTE);
+            SimpleDateFormat sdfLocalDate = new SimpleDateFormat("dd MMM yyyy");
+            localDateTime[0] = sdfLocalDate.format(local);
+            SimpleDateFormat sdfLocalTime = new SimpleDateFormat("h:mm a");
+            localDateTime[1] = sdfLocalTime.format(local);
+            Log.v("local date","Local date : "+localDateTime[0]);
+            Log.v("local time","Local Time : "+localDateTime[1]);
+        } catch (ParseException e1) {
+            e1.printStackTrace();
+        }
+        return localDateTime;
     }
 
     @Override

@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
- <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:app="http://schemas.android.com/apk/res-auto"
-xmlns:tools="http://schemas.android.com/tools"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-android:padding="16dp"
-android:orientation="vertical">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:orientation="vertical"
+    tools:context=".Activities.EventDetails">
 
     <!-- Event Name -->
     <LinearLayout
@@ -26,22 +27,43 @@ android:orientation="vertical">
             style="@style/EditorFieldStyle" />
     </LinearLayout>
 
+    <!-- Sport Name -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Label Sport Name-->
+        <TextView
+            android:text="@string/label_sportName"
+            style="@style/EditorLabelStyle" />
+
+        <!-- Event Sport Name field -->
+        <Spinner
+            android:id="@+id/sport_spinner"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            style="@style/EditorFieldStyle" />
+
+    </LinearLayout>
+
     <!-- Event Date -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <!-- Label Event Name-->
+        <!-- Label Event Date-->
         <TextView
             android:text="@string/label_eventDate"
             style="@style/EditorLabelStyle" />
 
-        <!-- Event Name field -->
+        <!-- Event Date field -->
         <EditText
             android:id="@+id/edit_event_date"
             android:hint="@string/label_eventDate"
             android:inputType="textCapWords"
+            android:focusable="false"
             style="@style/EditorFieldStyle" />
     </LinearLayout>
 
@@ -56,11 +78,12 @@ android:orientation="vertical">
             android:text="@string/label_eventTime"
             style="@style/EditorLabelStyle" />
 
-        <!-- Event Name field -->
+        <!-- Event Time field -->
         <EditText
             android:id="@+id/edit_event_time"
             android:hint="@string/label_eventTime"
             android:inputType="textCapWords"
+            android:focusable="false"
             style="@style/EditorFieldStyle" />
     </LinearLayout>
 

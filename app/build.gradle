@@ -36,5 +36,8 @@ dependencies {
     compile 'com.firebaseui:firebase-ui:1.2.0'
     compile 'com.android.support:recyclerview-v7:25.2.0'
     compile 'com.google.android.gms:play-services:10.2.4'
+    compile 'com.google.android.gms:play-services-maps:10.2.4'
+    compile 'com.google.android.gms:play-services-location:10.2.4'
+
 }
 apply plugin: 'com.google.gms.google-services'

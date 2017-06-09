@@ -1,4 +1,5 @@
 package com.example.android.sportit.Models;
+import org.json.JSONObject;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -26,11 +27,10 @@ public class Event {
 //    }
 
 
-    public Event(String eventName, String place, String date, String time, String createdBy, int playersRequired){
+    public Event(String eventName, String place, String dateTime, String createdBy, int playersRequired){
         this.eventName = eventName;
         this.place = place;
-        this.date = date;
-        this.time = time;
+        this.dateTime = dateTime;
         this.createdBy = createdBy;
         this.playersRequired = playersRequired;
         this.playersAttending = 0;
@@ -42,9 +42,7 @@ public class Event {
 
     private String place;
 
-    private String date;
-
-    private String time;
+    private String dateTime;
 
     private String eventID;
 
@@ -68,16 +66,10 @@ public class Event {
         return createdBy;
     }
 
-    public String getDate() {
-        return date;
-    }
+    public String getDateTime() { return dateTime; }
 
     public String getPlace() {
         return place;
-    }
-
-    public String getTime() {
-        return time;
     }
 
     public String getEventID() {

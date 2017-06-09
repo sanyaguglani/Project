@@ -7,8 +7,12 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.support.v7.widget.SearchView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -17,6 +21,7 @@ import com.example.android.sportit.Adapter.EventAdapter;
 import com.example.android.sportit.Activities.EventDetails;
 import com.example.android.sportit.Models.Event;
 import com.example.android.sportit.R;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -41,6 +46,7 @@ public class AttendingEventsFrag extends Fragment {
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
     private DatabaseReference eventsReference;
+    private FirebaseAuth firebaseAuth;
     private ValueEventListener valueEventListener;
 
     public AttendingEventsFrag() {
@@ -58,6 +64,7 @@ public class AttendingEventsFrag extends Fragment {
         empty = (TextView) rootView.findViewById(R.id.empty_view);
 
         firebaseDatabase = FirebaseDatabase.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
         event = new  ArrayList<Event>();
 
 //        eventArrayList.add(0, new Event("Football Match","Monash Caulfield Ground","20-May-2017", "5:00pm"));
@@ -71,7 +78,7 @@ public class AttendingEventsFrag extends Fragment {
         attendingList.setEmptyView(empty);
         attendingList.setAdapter(eventAdapter);
 
-        databaseReference = firebaseDatabase.getReference().child("users").child("RMBIva5WdIZyE7zcTbcQ8SPAGlZ2").child("eventsAttending");
+        databaseReference = firebaseDatabase.getReference().child("users").child(firebaseAuth.getCurrentUser().getUid()).child("eventsAttending");
 
         eventsReference = firebaseDatabase.getReference().child("events");
 
@@ -133,10 +140,42 @@ public class AttendingEventsFrag extends Fragment {
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // TODO Add your menu entries here
+        //super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.search_menu,menu);
+        MenuItem item = menu.findItem(R.id.search);
+
+        SearchView searchView = (SearchView)item.getActionView();
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                eventAdapter.getFilter().filter(newText);
+                return false;
+            }
+        });
+
+    }
+
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         eventAdapter.clear();
         databaseReference.removeEventListener(valueEventListener);
+
     }
 
 
