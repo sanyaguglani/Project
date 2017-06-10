@@ -61,7 +61,7 @@ public class MyEventsFrag extends Fragment {
 
         rootView = inflater.inflate(R.layout.list_layout, container, false);
 
-        firebaseDatabase = FirebaseDatabase.getInstance();
+        firebaseDatabase = FirebaseDatabase.getInstance();  //Instantiate firebase database
         firebaseAuth = FirebaseAuth.getInstance();
 
         event = new ArrayList<Event>();
@@ -74,21 +74,15 @@ public class MyEventsFrag extends Fragment {
         listView.setAdapter(eventAdapter);
 
         fab= (FloatingActionButton) rootView.findViewById(R.id.fab);
-//        fab.show();
-
-
-//        event.add(0, new Event("Football Match", "Monash Caulfield Ground", "20-May-2017", "5:00PM"));
-//        event.add(1, new Event("Badminton Match", "Oakleigh Ground", "10 May 2017", "10:30AM"));
 
        databaseReference = firebaseDatabase.getReference().child("events");
 
         valueEventListener = new ValueEventListener() {
 
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(DataSnapshot dataSnapshot) {      //IF created events exists
                 eventAdapter.clear();
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    //Log.v("In Loop", "In Loop");
                     Event e = postSnapshot.getValue(Event.class);
                     if (!e.getIsCancelled()) {
                         e.setEventID(postSnapshot.getKey());
@@ -98,8 +92,7 @@ public class MyEventsFrag extends Fragment {
                         empty.setVisibility(View.GONE);
                     }
                 }
-                if (eventAdapter.isEmpty()){
-                    //Log.v("List Empty", "List Empty found");
+                if (eventAdapter.isEmpty()){        //No events in created event list
                     loadingIndicator.setVisibility(View.GONE);
                     empty.setText("No Events Available. Create an Event");
                     empty.setVisibility(View.VISIBLE);
@@ -108,16 +101,16 @@ public class MyEventsFrag extends Fragment {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                System.out.println("The read failed: " + databaseError.getCode());      //???
-                //Log.v("In onCancelled", "In onCancelled");
+                System.out.println("The read failed: " + databaseError.getCode());
             }
         };
 
-        databaseReference.orderByChild("createdBy").equalTo(firebaseAuth.getCurrentUser().getUid()).addValueEventListener(valueEventListener);
+        databaseReference.orderByChild("createdBy").equalTo(firebaseAuth.getCurrentUser().getUid()).
+                addValueEventListener(valueEventListener);
 
         fab.setOnClickListener(new View.OnClickListener() {         //Add new Event on fab button
             @Override
-            public void onClick(View v) {
+            public void onClick(View v) { //For creating new events
                 Intent intent = new Intent(getContext(),EventDetails.class);
                 intent.putExtra("Caller Method","event add");
                 startActivity(intent);
@@ -132,7 +125,7 @@ public class MyEventsFrag extends Fragment {
                 Intent intent = new Intent(getContext(), EventDetails.class);
                 intent.putExtra("EventID",e.getEventID());
                 intent.putExtra("Caller Method","event details");
-                startActivity(intent);
+                startActivity(intent);  // View Event Details for selected event
             }
         });
 
@@ -148,7 +141,6 @@ public class MyEventsFrag extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         // TODO Add your menu entries here
-        //super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.search_menu,menu);
         MenuItem item = menu.findItem(R.id.search);
 

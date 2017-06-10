@@ -23,10 +23,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.Arrays;
 
-import static android.R.attr.data;
-import static android.os.Build.VERSION_CODES.M;
-import static java.security.AccessController.getContext;
-
 public class MainActivity extends AppCompatActivity {
 
     private FirebaseAuth firebaseAuth;
@@ -45,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();  //Firebase instance
         authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -65,22 +61,6 @@ public class MainActivity extends AppCompatActivity {
                             RC_SIGN_IN);
                 }
             }};
-
-//            // Find the view pager that will allow the user to swipe between fragments
-//            viewPager =(ViewPager) findViewById(R.id.viewpager);
-//
-//            // Create an adapter that knows which fragment should be shown on each page
-//            adapter =new FixTabPages(this,getSupportFragmentManager());
-//
-//            // Set the adapter onto the view pager
-//        viewPager.setAdapter(adapter);
-//        viewPager.setCurrentItem(1);
-//
-//            // Find the tab layout that shows the tabs
-//            tabLayout =(TabLayout)
-//
-//            findViewById(R.id.tabs);
-//        tabLayout.setupWithViewPager(viewPager);
     }
 
         @Override
@@ -117,10 +97,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.hasChild(userId)){
-                    Log.v("user exists", "user already present");
+                   // Toast.makeText(getApplicationContext(), "User already present", Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    Log.v("user exists", "user not present");
+                    Toast.makeText(getApplicationContext(), "User not present", Toast.LENGTH_SHORT).show();
                      user =  new User(userName, userEmail);
                     databaseReference.child(userId).setValue(user);
                 }
@@ -131,8 +111,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
-
         // Find the view pager that will allow the user to swipe between fragments
          viewPager = (ViewPager) findViewById(R.id.viewpager);
 

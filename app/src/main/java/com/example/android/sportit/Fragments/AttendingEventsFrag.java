@@ -37,6 +37,7 @@ public class AttendingEventsFrag extends Fragment {
 
     private ListView attendingList;
     private ArrayList<Event> event;
+    private ArrayList<String> eventId;
     private EventAdapter eventAdapter;
     private FloatingActionButton fab;
     private TextView empty;
@@ -48,6 +49,7 @@ public class AttendingEventsFrag extends Fragment {
     private DatabaseReference eventsReference;
     private FirebaseAuth firebaseAuth;
     private ValueEventListener valueEventListener;
+    private ValueEventListener valueEventListener2;
 
     public AttendingEventsFrag() {
         // Required empty public constructor
@@ -63,12 +65,9 @@ public class AttendingEventsFrag extends Fragment {
 
         empty = (TextView) rootView.findViewById(R.id.empty_view);
 
-        firebaseDatabase = FirebaseDatabase.getInstance();
+        firebaseDatabase = FirebaseDatabase.getInstance();  //Instantiate Firebase Instance
         firebaseAuth = FirebaseAuth.getInstance();
         event = new  ArrayList<Event>();
-
-//        eventArrayList.add(0, new Event("Football Match","Monash Caulfield Ground","20-May-2017", "5:00pm"));
-//        eventArrayList.add(1, new Event("Cricket Match","Monash Clayton","20-Jul-2017","6:00pm"));
 
         eventAdapter = new EventAdapter(getActivity(), event);
 
@@ -78,9 +77,31 @@ public class AttendingEventsFrag extends Fragment {
         attendingList.setEmptyView(empty);
         attendingList.setAdapter(eventAdapter);
 
-        databaseReference = firebaseDatabase.getReference().child("users").child(firebaseAuth.getCurrentUser().getUid()).child("eventsAttending");
+        databaseReference = firebaseDatabase.getReference().child("users").
+                child(firebaseAuth.getCurrentUser().getUid()).child("eventsAttending");
 
         eventsReference = firebaseDatabase.getReference().child("events");
+
+
+        valueEventListener2 = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                eventId.clear();
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()){
+                    Log.v("event id", "ids from users : "+postSnapshot.getKey());
+                    eventId.add(postSnapshot.getKey());
+                }
+
+                eventsReference.addValueEventListener(valueEventListener);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+
+        };
 
         valueEventListener = new ValueEventListener() {
             @Override
@@ -109,7 +130,6 @@ public class AttendingEventsFrag extends Fragment {
                 }
 
                 else{
-                    Log.v("message", "children does not exists");
                     loadingIndicator.setVisibility(View.GONE);
                     empty.setText("No Events joined");
                 }
@@ -131,7 +151,7 @@ public class AttendingEventsFrag extends Fragment {
                 Intent intent = new Intent(getContext(), EventDetails.class);
                 intent.putExtra("EventID",e.getEventID());
                 intent.putExtra("Caller Method","event details attending");
-                startActivity(intent);
+                startActivity(intent);  //Details for the selected event
             }
         });
 
@@ -148,8 +168,7 @@ public class AttendingEventsFrag extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         // TODO Add your menu entries here
-        //super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.search_menu,menu);
+        inflater.inflate(R.menu.search_menu,menu);      //Search menu options for the list
         MenuItem item = menu.findItem(R.id.search);
 
         SearchView searchView = (SearchView)item.getActionView();
@@ -175,6 +194,7 @@ public class AttendingEventsFrag extends Fragment {
         super.onDestroy();
         eventAdapter.clear();
         databaseReference.removeEventListener(valueEventListener);
+        eventsReference.removeEventListener(valueEventListener2);
 
     }
 

@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.example.android.sportit.Models.Event;
 import com.example.android.sportit.R;
 import android.widget.Filter;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import static android.R.attr.filter;
+import static com.facebook.FacebookSdk.getApplicationContext;
 
 /**
  * Created by Sanya on 21/05/2017.
@@ -31,7 +33,6 @@ import static android.R.attr.filter;
 public class EventAdapter extends ArrayAdapter<Event> {
 
     private Context eventContext;
-    //private ArrayList<Event> eventList;
     private ArrayList<Event> filteredData;
     private ArrayList<Event> originalData;
 
@@ -53,10 +54,8 @@ public class EventAdapter extends ArrayAdapter<Event> {
         // Check if the view has been created for the row. If not, inflate it
         if (convertView == null)
         {
-//            LayoutInflater inflater = (LayoutInflater) eventContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//            // Reference list item layout
-//            convertView = inflater.inflate(R.layout.list_item, null);
 
+            // Reference list item layout
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item, parent, false);
             // Setup ViewHolder and attach to view
             viewHolder = new ViewHolder();
@@ -71,11 +70,6 @@ public class EventAdapter extends ArrayAdapter<Event> {
         }
 
         Event currentEvent = getItem(position);
-
-//        // Assign values to the TextViews using the Monster object
-//        viewHolder.vEventName.setText(eventList.get(position).getEventName());
-//        viewHolder.vEventPlace.setText(eventList.get(position).getPlace());
-//        viewHolder.vEvenDate.setText(eventList.get(position).getDate().concat(" ").concat(eventList.get(position).getTime()));
 
         if (currentEvent.getIsCancelled()) {
             viewHolder.vEventName.setText(currentEvent.getEventName() + " - CANCELLED");
@@ -93,7 +87,7 @@ public class EventAdapter extends ArrayAdapter<Event> {
         try {
             Date convertedDate = sdf.parse(currentEvent.getDateTime());
             String timeZoneID = Calendar.getInstance().getTimeZone().getID();
-            local = new Date(convertedDate.getTime() + TimeZone.getTimeZone(timeZoneID).getOffset(convertedDate.getTime()));
+            local = new Date(convertedDate.getTime() + TimeZone.getTimeZone(timeZoneID).getOffset(convertedDate.getTime()));//local timezone date
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -104,6 +98,7 @@ public class EventAdapter extends ArrayAdapter<Event> {
         return convertView;
     }
 
+    //https://www.survivingwithandroid.com/2012/10/android-listview-custom-filter-and.html
     @Override
     public Filter getFilter() {
         return new Filter() {
@@ -115,12 +110,12 @@ public class EventAdapter extends ArrayAdapter<Event> {
                     originalData = new ArrayList<>(filteredData);
                 }
 
-                if (prefix == null || prefix.length() == 0) {
+                if (prefix == null || prefix.length() == 0) {  //no search text
                     final ArrayList<Event> list = new ArrayList<>(originalData);
 
                     results.values = list;
                     results.count = list.size();
-                } else {
+                } else {       //search text present
                     final String prefixString = prefix.toString().toLowerCase();
 
                     final ArrayList<Event> values = new ArrayList<>(originalData);
@@ -128,7 +123,9 @@ public class EventAdapter extends ArrayAdapter<Event> {
                     final ArrayList<Event> newValues = new ArrayList<>();
 
                     for (Event e : values){
-                        if (e.getEventName().toLowerCase().contains(prefixString)) {
+                        //Filter the search on name and location of event
+                        if (e.getEventName().toLowerCase().contains(prefixString) ||
+                                e.getPlace().toLowerCase().contains(prefixString) ) {
                             newValues.add(e);
                         }
                     }
@@ -142,7 +139,7 @@ public class EventAdapter extends ArrayAdapter<Event> {
 
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
-                Log.v("results","results published " + results.count);
+                Toast.makeText(getApplicationContext(), results.count+ " results found", Toast.LENGTH_SHORT).show();
                 filteredData = (ArrayList<Event>) results.values;
                 notifyDataSetChanged();
                 clear();

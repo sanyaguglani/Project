@@ -23,7 +23,7 @@ public class FixTabPages extends FragmentPagerAdapter {
     }
 
     @Override
-    public CharSequence getPageTitle(int position) {
+    public CharSequence getPageTitle(int position) {    //Setting Tab Titles
         switch (position){
             case 0:
                 return context.getString(R.string.category_attending);
@@ -38,7 +38,7 @@ public class FixTabPages extends FragmentPagerAdapter {
 
 
     @Override
-    public Fragment getItem(int position) {
+    public Fragment getItem(int position) {         //Instantiate Tab fragments
         switch (position){
             case 0:
                 return new AttendingEventsFrag();

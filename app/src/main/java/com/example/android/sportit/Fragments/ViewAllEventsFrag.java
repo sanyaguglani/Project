@@ -61,10 +61,11 @@ public class ViewAllEventsFrag extends Fragment {
 
         rootView = inflater.inflate(R.layout.list_layout, container, false);
 
-        firebaseDatabase = FirebaseDatabase.getInstance();
+        firebaseDatabase = FirebaseDatabase.getInstance();  //Instantiate Firebase Instance
         firebaseAuth = FirebaseAuth.getInstance();
         databaseReferenceEvents  = firebaseDatabase.getReference().child("events");
-        databaseReferenceUsers = firebaseDatabase.getReference().child("users").child(firebaseAuth.getCurrentUser().getUid()).child("eventsAttending");
+        databaseReferenceUsers = firebaseDatabase.getReference().child("users").
+                child(firebaseAuth.getCurrentUser().getUid()).child("eventsAttending");
 
         fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
         fab.setVisibility(View.GONE);
@@ -73,12 +74,6 @@ public class ViewAllEventsFrag extends Fragment {
 
         event = new ArrayList<Event>();
         eventId = new ArrayList<String>();
-
-
-//        event.add(0,new Event("Football Match","Monash Caulfield Ground","20-May-2017", "5:00PM"));
-//        event.add(1,new Event("Badminton Match", "Oakleigh Ground", "10 May 2017", "10:30AM"));
-//        event.add(2,new Event("Cricket Match","Monash Clayton","20-Jul-2017","6:00PM"));
-//        event.add(3,new Event("Rugby Match", "RMIT Ground", "18 May 2017", "09:30AM"));
 
         eventAdapter = new EventAdapter(getActivity(), event);
         loadingIndicator = rootView.findViewById(R.id.loading_indicator);
@@ -122,7 +117,7 @@ public class ViewAllEventsFrag extends Fragment {
                         empty.setVisibility(View.GONE);
                     }
                 }
-                if (eventAdapter.isEmpty()){
+                if (eventAdapter.isEmpty()){    //No events available
                     loadingIndicator.setVisibility(View.GONE);
                     empty.setText("No Events Available");
                     empty.setVisibility(View.VISIBLE);
@@ -145,7 +140,7 @@ public class ViewAllEventsFrag extends Fragment {
                 Intent intent = new Intent(getContext(), EventDetails.class);
                 intent.putExtra("EventID",e.getEventID());
                 intent.putExtra("Caller Method","view all events");
-                startActivity(intent);
+                startActivity(intent);  // View Event Details for selected event
             }
         });
 
@@ -160,8 +155,8 @@ public class ViewAllEventsFrag extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        //Setting menu options
         // TODO Add your menu entries here
-        //super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.search_menu,menu);
         MenuItem item = menu.findItem(R.id.search);
 

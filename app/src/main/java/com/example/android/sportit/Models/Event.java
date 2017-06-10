@@ -16,28 +16,6 @@ import static android.R.attr.name;
 
 public class Event {
 
-    public Event()
-    {}
-
-//    public Event(String eventName, String place, String date, String time){   // Dummy
-//        this.eventName = eventName;
-//        this.place = place;
-//        this.date = date;
-//        this.time = time;
-//    }
-
-
-    public Event(String eventName, String place, String dateTime, String createdBy, int playersRequired){
-        this.eventName = eventName;
-        this.place = place;
-        this.dateTime = dateTime;
-        this.createdBy = createdBy;
-        this.playersRequired = playersRequired;
-        this.playersAttending = 0;
-        this.isCancelled = false;
-    };
-
-
     private String eventName;
 
     private String place;
@@ -54,9 +32,78 @@ public class Event {
 
     private boolean isCancelled;
 
+    public Event()
+    {
+        //default constructor
+    }
 
-    //getter setter for all attributes?
+    public Event(String eventName,  String place, String dateTime, String createdBy, int playersRequired){
+        this.eventName = eventName;
+        this.place = place;
+        this.dateTime = dateTime;
+        this.createdBy = createdBy;
+        this.playersRequired = playersRequired;
+        this.playersAttending = 0;
+        this.isCancelled = false;
+    };
 
+    //Validate user input
+    public String validate(String eventName, String eventDate, String eventPlace, String eventTime, int playersRequired)
+    {
+
+        String result;
+
+        if((eventName != null) && (eventDate !=null) && (eventPlace !=null) && (eventTime !=null) ){
+            result = "Success: ";
+        }
+        else
+        {
+            result= "Error: \n";
+            if (eventName == null)
+                result= result+ "Please enter a valid event name \n";
+            if (eventDate == null)
+                result= result+ "Please select a valid event date \n";
+            if (eventPlace == null)
+                result= result+ "Please select a valid event place \n";
+            if (eventTime == null)
+                result= result+ "Please select a valid event time \n";
+            if (playersRequired <= 0)
+                result= result+ "Please enter a valid number of players required \n";
+        }
+        return  result;
+    }
+
+    //getter and setter for all attributes
+    public void setEventName(String eventName) {
+        this.eventName = eventName;
+    }
+    public void setPlace(String place) {
+        this.place = place;
+    }
+
+    public void setDateTime(String dateTime) {
+        this.dateTime = dateTime;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public void setPlayersRequired(int playersRequired) {
+        this.playersRequired = playersRequired;
+    }
+
+    public void setPlayersAttending(int playersAttending) {
+        this.playersAttending = playersAttending;
+    }
+
+    public void setCancelled(boolean cancelled) {
+        isCancelled = cancelled;
+    }
+
+    public void setEventID(String eventID) {
+        this.eventID = eventID;
+    }
 
     public String getEventName(){
         return eventName;
@@ -74,10 +121,6 @@ public class Event {
 
     public String getEventID() {
         return eventID;
-    }
-
-    public void setEventID(String eventID) {
-        this.eventID = eventID;
     }
 
     public int getPlayersRequired(){
