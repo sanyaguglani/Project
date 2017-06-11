@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.sportit.Models.Event;
@@ -40,6 +41,7 @@ public class EventAdapter extends ArrayAdapter<Event> {
         TextView vEventName;
         TextView vEventPlace;
         TextView vEventDate;
+        private ImageView vImageView;
     }
 
 
@@ -62,6 +64,7 @@ public class EventAdapter extends ArrayAdapter<Event> {
             viewHolder.vEventName = (TextView) convertView.findViewById(R.id.event_name);
             viewHolder.vEventPlace = (TextView) convertView.findViewById(R.id.event_place);
             viewHolder.vEventDate = (TextView) convertView.findViewById(R.id.event_date);
+            viewHolder.vImageView = (ImageView) convertView.findViewById(R.id.image);
             convertView.setTag(viewHolder);
         }
         else {
@@ -94,6 +97,7 @@ public class EventAdapter extends ArrayAdapter<Event> {
         sdf = new SimpleDateFormat("dd MMM yyyy, h:mm a");
         String dateTime = sdf.format(local);
         viewHolder.vEventDate.setText(dateTime);
+        viewHolder.vImageView.setImageResource(currentEvent.getImageResourceId());
 
         return convertView;
     }
@@ -136,10 +140,11 @@ public class EventAdapter extends ArrayAdapter<Event> {
 
                 return results;
             }
+//https://stackoverflow.com/questions/2718202/custom-filtering-in-android-using-arrayadapter
 
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
-                Toast.makeText(getApplicationContext(), results.count+ " results found", Toast.LENGTH_SHORT).show();
+             //   Toast.makeText(getApplicationContext(), results.count+ " results found", Toast.LENGTH_SHORT).show();
                 filteredData = (ArrayList<Event>) results.values;
                 notifyDataSetChanged();
                 clear();

@@ -2,13 +2,16 @@ package com.example.android.sportit.Activities;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -16,11 +19,10 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import java.io.Console;
-import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -32,7 +34,6 @@ import java.util.TimeZone;
 
 import com.example.android.sportit.Models.Event;
 import com.example.android.sportit.R;
-import com.facebook.internal.Validate;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.*;
@@ -45,7 +46,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import static android.R.attr.duration;
+import static android.R.id.message;
 
 
 /**
@@ -63,6 +64,8 @@ public class EventDetails extends AppCompatActivity {
     private Button button1;      //For Join/Withdraw/Save Button
     private Button button2;      // For share button
     private Button placePickerButton;   // To select location
+    private TextView display_type_text;
+    private TextView select_type_text;
     private java.util.Calendar cal;
     int eventYear, eventMonth, eventDay;
     int hour;
@@ -75,18 +78,83 @@ public class EventDetails extends AppCompatActivity {
     private String eventID;
     private Event e;
 
+    private String name;
     private String location;
     private Double lat;
     private Double lon;
     private String[] loc;
+    private String eventDate;
+    private String time;
     int PLACE_PICKER_REQUEST = 1;
     private static String timeZoneID;
     private Event event;
+    private View eventType;
+    private View eventSpinner;
+    private EditText eventTypeEditText;
+    private String sport;
+    private int imageID;
+    private int playersRequired;
+    private String msg;
 
     private ValueEventListener valueEventListener;
     private FirebaseDatabase firebaseDatabase;
     private FirebaseAuth firebaseAuth;
     private DatabaseReference databaseReference;
+
+    /** Boolean flag that keeps track of whether the event has been edited (true) or not (false) */
+    private boolean eventHasChanged = false;
+
+    private View.OnTouchListener touchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            eventHasChanged = true;
+            return false;
+        }
+    };
+
+    private void showUnsavedChangesDialog(
+            DialogInterface.OnClickListener discardButtonClickListener) {
+        /* Create an AlertDialog.Builder and set the message, and click listeners
+         for the positive and negative buttons on the dialog */
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.unsaved_changes_dialog_msg);
+        builder.setPositiveButton(R.string.discard, discardButtonClickListener);
+        builder.setNegativeButton(R.string.keep_editing, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                /* User clicked the "Keep editing" button, so dismiss the dialog
+                 and continue editing event. */
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        // Create and show the AlertDialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!eventHasChanged) {
+            super.onBackPressed();
+            return;
+        }
+
+        /* Otherwise if there are unsaved changes, setup a dialog to warn the user.
+         Create a click listener to handle the user confirming that changes should be discarded. */
+        DialogInterface.OnClickListener discardButtonClickListener =
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        // User clicked "Discard" button, close the current activity.
+                        finish();
+                    }
+                };
+
+        // Show dialog that there are unsaved changes
+        showUnsavedChangesDialog(discardButtonClickListener);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,41 +180,56 @@ public class EventDetails extends AppCompatActivity {
                 update();
             }
         };      //https://stackoverflow.com/questions/14933330/datepicker-how-to-popup-datepicker-when-click-on-edittext
+        //https://stackoverflow.com/questions/16541258/android-timepickerdialog-timepickerdialog-ontimesetlistener
 
 
         //Instantiate UI elements
         eventNameEditText = (EditText) findViewById(R.id.edit_event_name);
+        eventTypeEditText = (EditText) findViewById(R.id.edit_event_type);
+        eventSpinner =  findViewById(R.id.sport_spinner);
+        eventType = findViewById(R.id.event_type);
         eventDateEditText = (EditText) findViewById(R.id.edit_event_date);
         eventTimeEditText = (EditText) findViewById(R.id.edit_event_time);
         playersAttendingEditText = (EditText) findViewById(R.id.edit_players_attending);
         playersRequiredEditText = (EditText) findViewById(R.id.edit_players_required);
         placePickerButton = (Button) findViewById(R.id.place_picker);
+        display_type_text = (TextView) findViewById(R.id.display_type_text);
+        select_type_text = (TextView) findViewById(R.id.select_type_text);
+
+        //Instantiate the spinner element for sports category
+        final Spinner spinner = (Spinner) findViewById(R.id.sport_spinner);
+
+        eventNameEditText.setOnTouchListener(touchListener);
+        eventDateEditText.setOnTouchListener(touchListener);
+        eventTimeEditText.setOnTouchListener(touchListener);
+        playersRequiredEditText.setOnTouchListener(touchListener);
+        spinner.setOnTouchListener(touchListener);
         playersAttendingEditText.setEnabled(false);
 
         button1 = (Button) findViewById(R.id.button1); //UI Button for Join/Withdraw/Save control
         button2 = (Button) findViewById(R.id.button2);  //Share Button
 
-//        //Instantiate the spinner element for sports category
-//        Spinner spinner = (Spinner) findViewById(R.id.sport_spinner);
-//
-//        // Create an ArrayAdapter using the string array and a default spinner layout
-//        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-//                R.array.sports_array, android.R.layout.simple_spinner_dropdown_item);
-//        // Specify the layout to use when the list of choices appears
-//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        // Apply the adapter to the spinner
-//        spinner.setAdapter(adapter);
-//
-//        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {      //https://developer.android.com/guide/topics/ui/controls/spinner.html
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                // On selecting a spinner item
-//                sport = parent.getItemAtPosition(position).toString();
-//            }
-//            public void onNothingSelected(AdapterView<?> arg0) {
-//                // TODO Auto-generated method stub
-//            }
-//        });
+
+
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        final ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.sports_array, android.R.layout.simple_spinner_dropdown_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        spinner.setAdapter(adapter);
+
+        //https://developer.android.com/guide/topics/ui/controls/spinner.html
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // On selecting a spinner item
+                sport = parent.getItemAtPosition(position).toString();
+            }
+            public void onNothingSelected(AdapterView<?> arg0) {
+                // TODO Auto-generated method stub
+            }
+        });
 
         eventDateEditText.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -177,6 +260,8 @@ public class EventDetails extends AppCompatActivity {
         previousActivity = intent.getStringExtra("Caller Method");  //extracting calling activity name from intent
         eventID = intent.getStringExtra("EventID");
 
+        //https://stackoverflow.com/questions/38240110/firebase-many-to-many-relations-how-to-retrieve-data
+        //https://firebase.google.com/docs/database/android/start/
         valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -184,15 +269,20 @@ public class EventDetails extends AppCompatActivity {
                     e = dataSnapshot.getValue(Event.class);     // Calling Event attribute methods for each event object
                     eventNameEditText.setText(e.getEventName());      //Setting values to output screen
                     playersRequiredEditText.setText("" + e.getPlayersRequired());
+                    eventTypeEditText.setText(e.getEventType());    //Set the event category
+                    spinner.setSelection(adapter.getPosition(e.getEventType()));
                     localDateTime = utcToLocal(e.getDateTime());   // Get the local time zone DateTime field
                     eventDateEditText.setText(localDateTime[0]);    //Extract Date from DateTime Value
                     eventTimeEditText.setText(localDateTime[1]);    //Extract Time from DateTime Value
                     location = e.getPlace();    //Get the location
                     loc = location.split("[|]");    // Split location name, latitude and longitude
                     placePickerButton.setText(loc[0]);  //Set the location name
+                    //https://stackoverflow.com/questions/14746582/how-to-store-the-latlng-variable-in-android-in-an-sql-lite-database-for-use-late
                     lat = Double.parseDouble(loc[1]);   //Set the latitude value
                     lon = Double.parseDouble(loc[2]);   //Set the longitude values
                     playersAttendingEditText.setText("" + e.getPlayersAttending());
+                    msg = "Hey. Check this event on SportIt. Event Details: "+e.getEventName() +
+                            " on "+ e.getDateTime() + " at " +loc[0] ;
                     if (e.getPlayersRequired() == e.getPlayersAttending() &&
                             previousActivity.contentEquals("view all events")) {
                         button1.setVisibility(View.GONE);  //No option to Join the event if number of players = number of players attending
@@ -216,13 +306,19 @@ public class EventDetails extends AppCompatActivity {
         }
 
 
+        //https://stackoverflow.com/questions/25147612/can-i-check-which-the-previous-activity-was-android
+
         if (previousActivity.contentEquals("event add")) {        //Adding new event on myEvents page
             setTitle("Create Event");
             button1.setText("Create Event");
             button2.setVisibility(View.GONE);       // Disable button to share event
             button1.setVisibility(View.VISIBLE);
+            eventSpinner.setVisibility(View.VISIBLE);
+            eventType.setVisibility(View.GONE);
             playersAttendingEditText.setVisibility(View.GONE);     //Disable players attending field
             findViewById(R.id.label_playersAttending).setVisibility(View.GONE);
+            select_type_text.setVisibility(View.VISIBLE);
+            display_type_text.setVisibility(View.GONE);
             enableEditing();
             invalidateOptionsMenu();
         }
@@ -232,8 +328,12 @@ public class EventDetails extends AppCompatActivity {
             setTitle("Event Created");
             button1.setVisibility(View.GONE);       //Disable button to withdraw/join/save
             button2.setVisibility(View.VISIBLE);    //Share Button
+            eventSpinner.setVisibility(View.GONE);
+            eventType.setVisibility(View.VISIBLE);
             playersAttendingEditText.setVisibility(View.VISIBLE);
             findViewById(R.id.label_playersAttending).setVisibility(View.VISIBLE);
+            select_type_text.setVisibility(View.GONE);
+            display_type_text.setVisibility(View.VISIBLE);
             disableEditing();
             invalidateOptionsMenu();
         }
@@ -244,8 +344,12 @@ public class EventDetails extends AppCompatActivity {
             button1.setText("Withdraw");
             button2.setVisibility(View.VISIBLE);
             button1.setVisibility(View.VISIBLE);
+            eventSpinner.setVisibility(View.GONE);
+            eventType.setVisibility(View.VISIBLE);
             playersAttendingEditText.setVisibility(View.VISIBLE);
             findViewById(R.id.label_playersAttending).setVisibility(View.VISIBLE);
+            select_type_text.setVisibility(View.GONE);
+            display_type_text.setVisibility(View.VISIBLE);
             disableEditing();
             invalidateOptionsMenu();
         }
@@ -254,8 +358,12 @@ public class EventDetails extends AppCompatActivity {
             setTitle("Event Information");
             button1.setText("Join Event");
             button2.setVisibility(View.VISIBLE);
+            eventSpinner.setVisibility(View.GONE);
+            eventType.setVisibility(View.VISIBLE);
             playersAttendingEditText.setVisibility(View.VISIBLE);
             findViewById(R.id.label_playersAttending).setVisibility(View.VISIBLE);
+            select_type_text.setVisibility(View.GONE);
+            display_type_text.setVisibility(View.VISIBLE);
             disableEditing();       //Validate edit text as disabled
             invalidateOptionsMenu();
         }
@@ -265,8 +373,12 @@ public class EventDetails extends AppCompatActivity {
             button1.setText("Save Changes");
             button2.setVisibility(View.GONE);
             button1.setVisibility(View.VISIBLE);
+            eventSpinner.setVisibility(View.VISIBLE);
+            eventType.setVisibility(View.GONE);
             playersAttendingEditText.setVisibility(View.GONE);
             findViewById(R.id.label_playersAttending).setVisibility(View.GONE);
+            select_type_text.setVisibility(View.VISIBLE);
+            display_type_text.setVisibility(View.GONE);
             enableEditing();        //Validate edit text as enabled
             invalidateOptionsMenu();    //update menu options for every intent
         }
@@ -286,7 +398,7 @@ public class EventDetails extends AppCompatActivity {
                 else if (previousActivity.contentEquals("event details attending")){    //Withdraw event
                     leaveEvent(e.getPlayersAttending());
                 }
-                e = null;    //****
+            //    e = null;    //****
                 finish();
             }
         });
@@ -297,7 +409,9 @@ public class EventDetails extends AppCompatActivity {
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
                 sendIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Check this event on SportIt");  //For email apps
-                sendIntent.putExtra(Intent.EXTRA_TEXT, "Hey. Check this event on SportIt. Please login to SportIt");//Can be updated to include more details
+                sendIntent.putExtra(Intent.EXTRA_TEXT, msg);
+//                "Hey. Check this event on SportIt. vent Details: "+name +
+//                        " on "+ date + " "+ time+ " at " +location);//Can be updated to include more details
                 sendIntent.setType("text/plain");
                 startActivity(Intent.createChooser(sendIntent,"Select App"));
             }
@@ -375,7 +489,7 @@ public class EventDetails extends AppCompatActivity {
                 startEditEvent();
                 return true;
             case R.id.action_delete:
-                deleteEvent();
+                showDeleteConfirmationDialog();
                 finish();
                 return true;
         }
@@ -407,38 +521,40 @@ public class EventDetails extends AppCompatActivity {
     private void saveEventData() {
         String userID = firebaseAuth.getCurrentUser().getUid();
         if (!userID.isEmpty()) {
-            String eventName = eventNameEditText.getText().toString().trim();
-            String eventDate = eventDateEditText.getText().toString().trim();
-            String eventPlace = location;
-            String eventTime = eventTimeEditText.getText().toString().trim();
-            int playersRequired = Integer.parseInt(playersRequiredEditText.getText().toString().trim());
+            name = eventNameEditText.getText().toString().trim();
+            eventDate  = eventDateEditText.getText().toString().trim();
+            time = eventTimeEditText.getText().toString().trim();
+            playersRequired = Integer.parseInt(playersRequiredEditText.getText().toString().trim());
+            imageID = findImageID();
 
-            cal.set(eventYear, eventMonth, eventDay, hour, min);
+            cal.set(eventYear,eventMonth,eventDay,hour,min);
             Date date = cal.getTime();
             String eventDateTime = localToUTC(date);
 
-            String res = event.validate(eventName, eventDate, eventPlace, eventTime, playersRequired);  //Validate Input parameters
-            if (!res.contains("Error:")) {
-
+          /*  Boolean res = validate(name, sport, eventDate, loc[0], time, playersRequired);  //Validate Input parameters
+            if (res) {
+*/
                 if ((previousActivity.contentEquals("event add"))) {
                     //Create event id and add new event
-                    Event event = new Event(eventName, eventPlace, eventDateTime, userID, playersRequired);
+                    Event event = new Event(name, sport, location, eventDateTime, userID, playersRequired, imageID);
                     databaseReference.child("events").push().setValue(event);
-                } else if ((previousActivity.contentEquals("edit event"))) {
+                }
+                else if ((previousActivity.contentEquals("edit event"))) {
                     //Update the event details to existing child in Database
-                    Map<String, Object> update = new HashMap<>();
-                    update.put("events/" + eventID + "/date", eventDate);
-                    update.put("events/" + eventID + "/eventName", eventName);
-                    update.put("events/" + eventID + "/place", location);
-                    update.put("events/" + eventID + "/time", eventTime);
+                    Map<String,Object> update = new HashMap<>();
+                    update.put("events/"+eventID+"/eventName",name);
+                    update.put("events/"+eventID+"/eventType",sport);
+                    update.put("events/"+eventID+"/place",location);
+                    update.put("events/"+eventID+"/dateTime",eventDateTime);
+                    update.put("events/"+eventID+"/imageResourceId",imageID);
                     databaseReference.updateChildren(update);
 
                 }
-            } else {
-                Toast.makeText(getApplicationContext(), res, Toast.LENGTH_SHORT).show();
-            }
+            } /*else {
+                Toast.makeText(getApplicationContext(), "Please select all values", Toast.LENGTH_SHORT).show();
+            } */
         }
-    }
+
 
     //Delete event
     private void deleteEvent(){
@@ -448,6 +564,31 @@ public class EventDetails extends AppCompatActivity {
         if (e.getPlayersAttending() == 0){      //Only delete if number of user joined = 0
             databaseReference.child("events").child(eventID).removeValue();
         }
+    }
+
+    private void showDeleteConfirmationDialog() {
+        // Create an AlertDialog.Builder and set the message, and click listeners
+        // for the postive and negative buttons on the dialog.
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.delete_dialog_msg);
+        builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked the "Delete" button, so delete the event.
+                deleteEvent();
+                finish();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        // Create and show the AlertDialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
     //Edit event
@@ -530,6 +671,61 @@ public class EventDetails extends AppCompatActivity {
             e1.printStackTrace();
         }
         return localDateTime;
+    }
+/*
+https://stackoverflow.com/questions/8573250/android-how-can-i-convert-string-to-date
+https://stackoverflow.com/questions/37390080/convert-local-time-to-utc-and-vice-versa
+https://stackoverflow.com/questions/16541258/android-timepickerdialog-timepickerdialog-ontimesetlistener
+*/
+    private int findImageID(){
+        switch (sport){
+            case "Cricket":
+                return R.drawable.cricket;
+            case "Football":
+                return R.drawable.football;
+            case "Tennis":
+                return R.drawable.tennis;
+            case "Badminton":
+                return R.drawable.badminton;
+            case "Rugby":
+                return R.drawable.rugby;
+            case "Basketball":
+                return R.drawable.basketball;
+            case "Volleyball":
+                return R.drawable.volleyball;
+            case "Baseball":
+                return R.drawable.baseball;
+        }
+        return -1;
+    }
+
+    //Validate user input
+    public boolean validate(String eventName, String eventType, String eventDate, String eventPlace, String eventTime, int playersRequired)
+    {
+
+        boolean result;
+
+        if((eventName != null) && (eventType != null) && (eventDate !=null) &&
+                (eventPlace !=null) && (eventTime !=null) && (playersRequired >0) ){
+            result = true;
+        }
+        else
+        {
+            result= false;
+//            if (eventName == null)
+//                result= result+ "Please enter a valid event name \n";
+//            if (eventType == null)
+//                result= result+ "Please select a valid event category \n";
+//            if (eventDate == null)
+//                result= result+ "Please select a valid event date \n";
+//            if (eventPlace == null)
+//                result= result+ "Please select a valid event place \n";
+//            if (eventTime == null)
+//                result= result+ "Please select a valid event time \n";
+//            if (playersRequired <= 0)
+//                result= result+ "Please enter a valid number of players required \n";
+        }
+        return  result;
     }
 
     @Override

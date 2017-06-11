@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
                    // Toast.makeText(getApplicationContext(), "User already present", Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    Toast.makeText(getApplicationContext(), "User not present", Toast.LENGTH_SHORT).show();
+                   // Toast.makeText(getApplicationContext(), "User not present", Toast.LENGTH_SHORT).show();
                      user =  new User(userName, userEmail);
                     databaseReference.child(userId).setValue(user);
                 }

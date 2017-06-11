@@ -24,6 +24,8 @@ public class Event {
 
     private String eventID;
 
+    private String eventType;
+
     private String createdBy;
 
     private int playersRequired;
@@ -32,28 +34,33 @@ public class Event {
 
     private boolean isCancelled;
 
+    private int imageResourceId;
+
     public Event()
     {
         //default constructor
     }
 
-    public Event(String eventName,  String place, String dateTime, String createdBy, int playersRequired){
+
+    public Event(String eventName, String eventType, String place, String dateTime, String createdBy, int playersRequired, int imageResourceId){
         this.eventName = eventName;
+        this.eventType = eventType;
         this.place = place;
         this.dateTime = dateTime;
         this.createdBy = createdBy;
         this.playersRequired = playersRequired;
+        this.imageResourceId = imageResourceId;
         this.playersAttending = 0;
         this.isCancelled = false;
     };
 
     //Validate user input
-    public String validate(String eventName, String eventDate, String eventPlace, String eventTime, int playersRequired)
+    public String validate(String eventName, String eventType, String eventDate, String eventPlace, String eventTime, int playersRequired)
     {
 
         String result;
 
-        if((eventName != null) && (eventDate !=null) && (eventPlace !=null) && (eventTime !=null) ){
+        if((eventName != null) && (eventType != null) && (eventDate !=null) && (eventPlace !=null) && (eventTime !=null) ){
             result = "Success: ";
         }
         else
@@ -61,6 +68,8 @@ public class Event {
             result= "Error: \n";
             if (eventName == null)
                 result= result+ "Please enter a valid event name \n";
+            if (eventType == null)
+                result= result+ "Please select a valid event category \n";
             if (eventDate == null)
                 result= result+ "Please select a valid event date \n";
             if (eventPlace == null)
@@ -100,9 +109,15 @@ public class Event {
     public void setCancelled(boolean cancelled) {
         isCancelled = cancelled;
     }
-
+    public void setImageResourceId(int imageResourceId) {
+        this.imageResourceId = imageResourceId;
+    }
     public void setEventID(String eventID) {
         this.eventID = eventID;
+    }
+
+    public void setEventType (String eventType) {
+        this.eventType = eventType;
     }
 
     public String getEventName(){
@@ -123,6 +138,8 @@ public class Event {
         return eventID;
     }
 
+    public String getEventType() { return eventType; }
+
     public int getPlayersRequired(){
         return playersRequired;
     }
@@ -132,4 +149,11 @@ public class Event {
     }
 
     public boolean getIsCancelled(){ return isCancelled; }
+
+    public int getImageResourceId() {
+        return imageResourceId;
+    }
+
+
+
 }
