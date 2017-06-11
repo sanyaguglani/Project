@@ -54,34 +54,6 @@ public class Event {
         this.isCancelled = false;
     };
 
-    //Validate user input
-    public String validate(String eventName, String eventType, String eventDate, String eventPlace, String eventTime, int playersRequired)
-    {
-
-        String result;
-
-        if((eventName != null) && (eventType != null) && (eventDate !=null) && (eventPlace !=null) && (eventTime !=null) ){
-            result = "Success: ";
-        }
-        else
-        {
-            result= "Error: \n";
-            if (eventName == null)
-                result= result+ "Please enter a valid event name \n";
-            if (eventType == null)
-                result= result+ "Please select a valid event category \n";
-            if (eventDate == null)
-                result= result+ "Please select a valid event date \n";
-            if (eventPlace == null)
-                result= result+ "Please select a valid event place \n";
-            if (eventTime == null)
-                result= result+ "Please select a valid event time \n";
-            if (playersRequired <= 0)
-                result= result+ "Please enter a valid number of players required \n";
-        }
-        return  result;
-    }
-
     //getter and setter for all attributes
     public void setEventName(String eventName) {
         this.eventName = eventName;

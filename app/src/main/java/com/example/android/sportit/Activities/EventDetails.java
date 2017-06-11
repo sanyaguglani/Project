@@ -46,8 +46,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import static android.R.id.message;
-
 
 /**
  * Created by Sanya on 19/05/2017.
@@ -282,7 +280,7 @@ public class EventDetails extends AppCompatActivity {
                     lon = Double.parseDouble(loc[2]);   //Set the longitude values
                     playersAttendingEditText.setText("" + e.getPlayersAttending());
                     msg = "Hey. Check this event on SportIt. Event Details: "+e.getEventName() +
-                            " on "+ e.getDateTime() + " at " +loc[0] ;
+                            " on "+ e.getDateTime() + " UTC at " +loc[0] ;
                     if (e.getPlayersRequired() == e.getPlayersAttending() &&
                             previousActivity.contentEquals("view all events")) {
                         button1.setVisibility(View.GONE);  //No option to Join the event if number of players = number of players attending
@@ -398,7 +396,6 @@ public class EventDetails extends AppCompatActivity {
                 else if (previousActivity.contentEquals("event details attending")){    //Withdraw event
                     leaveEvent(e.getPlayersAttending());
                 }
-            //    e = null;    //****
                 finish();
             }
         });
@@ -410,8 +407,6 @@ public class EventDetails extends AppCompatActivity {
                 sendIntent.setAction(Intent.ACTION_SEND);
                 sendIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Check this event on SportIt");  //For email apps
                 sendIntent.putExtra(Intent.EXTRA_TEXT, msg);
-//                "Hey. Check this event on SportIt. vent Details: "+name +
-//                        " on "+ date + " "+ time+ " at " +location);//Can be updated to include more details
                 sendIntent.setType("text/plain");
                 startActivity(Intent.createChooser(sendIntent,"Select App"));
             }
@@ -490,7 +485,6 @@ public class EventDetails extends AppCompatActivity {
                 return true;
             case R.id.action_delete:
                 showDeleteConfirmationDialog();
-                finish();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -521,40 +515,67 @@ public class EventDetails extends AppCompatActivity {
     private void saveEventData() {
         String userID = firebaseAuth.getCurrentUser().getUid();
         if (!userID.isEmpty()) {
-            name = eventNameEditText.getText().toString().trim();
-            eventDate  = eventDateEditText.getText().toString().trim();
-            time = eventTimeEditText.getText().toString().trim();
-            playersRequired = Integer.parseInt(playersRequiredEditText.getText().toString().trim());
+
+            boolean validData = true;
+            String eventName = eventNameEditText.getText().toString().trim();
+            String eventPlace = location;
+            int playersRequired = -1;
+            try {
+                playersRequired = Integer.parseInt(playersRequiredEditText.getText().toString().trim());
+                if(!isValidPlayersRequired(playersRequired)){
+                    validData = false;
+                    playersRequiredEditText.setError("Number of players required cannot be greater than 50");
+                }
+            }
+            catch (NumberFormatException e){
+                validData = false;
+                Log.v("input players","invalid input");
+                playersRequiredEditText.setError("Please enter numeric values");
+            }
             imageID = findImageID();
 
-            cal.set(eventYear,eventMonth,eventDay,hour,min);
-            Date date = cal.getTime();
-            String eventDateTime = localToUTC(date);
+            Calendar newCal = Calendar.getInstance();
+            newCal.set(eventYear,eventMonth,eventDay,hour,min);
+            Date date = newCal.getTime();
 
-          /*  Boolean res = validate(name, sport, eventDate, loc[0], time, playersRequired);  //Validate Input parameters
-            if (res) {
-*/
+            if (!isValidEventName(eventName)){
+                validData = false;
+                eventNameEditText.setError("Event name cannot be blank and should be less than 40 characters");
+            }
+            if (!isValidLocation(location)){
+                validData = false;
+                Toast.makeText(this, "Please select a valid location", Toast.LENGTH_SHORT).show();
+            }
+            if (!isValidDateTime(date)){
+                validData = false;
+                Toast.makeText(this, "Please select a future date and time.", Toast.LENGTH_SHORT).show();
+            }
+
+
+            if (validData) {
+                String eventDateTime = localToUTC(date);
+
                 if ((previousActivity.contentEquals("event add"))) {
-                    //Create event id and add new event
-                    Event event = new Event(name, sport, location, eventDateTime, userID, playersRequired, imageID);
+                    Event event = new Event(eventName, eventPlace, eventDateTime, userID, sport, playersRequired, imageID);
                     databaseReference.child("events").push().setValue(event);
-                }
-                else if ((previousActivity.contentEquals("edit event"))) {
-                    //Update the event details to existing child in Database
-                    Map<String,Object> update = new HashMap<>();
-                    update.put("events/"+eventID+"/eventName",name);
-                    update.put("events/"+eventID+"/eventType",sport);
-                    update.put("events/"+eventID+"/place",location);
-                    update.put("events/"+eventID+"/dateTime",eventDateTime);
-                    update.put("events/"+eventID+"/imageResourceId",imageID);
+                } else if ((previousActivity.contentEquals("edit event"))) {
+
+                    Map<String, Object> update = new HashMap<>();
+
+                    update.put("events/" + eventID + "/eventName", eventName);
+                    update.put("events/" + eventID + "/eventType", sport);
+                    update.put("events/" + eventID + "/place", location);
+                    update.put("events/" + eventID + "/dateTime", eventDateTime);
+                    update.put("events/" + eventID + "/imageResourceId", imageID);
                     databaseReference.updateChildren(update);
-
                 }
-            } /*else {
-                Toast.makeText(getApplicationContext(), "Please select all values", Toast.LENGTH_SHORT).show();
-            } */
+                finish();
+            }
         }
-
+        else{
+            Log.v("Event entry", "user id not present");
+        }
+        }
 
     //Delete event
     private void deleteEvent(){
@@ -699,33 +720,37 @@ https://stackoverflow.com/questions/16541258/android-timepickerdialog-timepicker
         return -1;
     }
 
-    //Validate user input
-    public boolean validate(String eventName, String eventType, String eventDate, String eventPlace, String eventTime, int playersRequired)
-    {
-
-        boolean result;
-
-        if((eventName != null) && (eventType != null) && (eventDate !=null) &&
-                (eventPlace !=null) && (eventTime !=null) && (playersRequired >0) ){
-            result = true;
+    private boolean isValidEventName(String name){
+        if (name != null && name.length() > 0 && name.length() <= 40){
+            return true;
         }
-        else
-        {
-            result= false;
-//            if (eventName == null)
-//                result= result+ "Please enter a valid event name \n";
-//            if (eventType == null)
-//                result= result+ "Please select a valid event category \n";
-//            if (eventDate == null)
-//                result= result+ "Please select a valid event date \n";
-//            if (eventPlace == null)
-//                result= result+ "Please select a valid event place \n";
-//            if (eventTime == null)
-//                result= result+ "Please select a valid event time \n";
-//            if (playersRequired <= 0)
-//                result= result+ "Please enter a valid number of players required \n";
+        return false;
+    }
+
+    private boolean isValidLocation(String location){
+        if (location != null && location.length() >0){
+            return true;
         }
-        return  result;
+        return false;
+    }
+
+    private boolean isValidPlayersRequired(int players){
+        if (players > 0 && players <= 50){
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isValidDateTime(Date date){
+        //should be future date and time
+        Date currentDateTime = Calendar.getInstance().getTime();
+        Log.v("dateTime","ct " +currentDateTime);
+        Log.v("dateTime","selected " +date);
+        Log.v("value",""+ date.after(currentDateTime));
+        if (date.after(currentDateTime)){
+            return true;
+        }
+        return false;
     }
 
     @Override

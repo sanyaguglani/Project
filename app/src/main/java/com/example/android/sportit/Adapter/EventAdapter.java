@@ -1,7 +1,6 @@
 package com.example.android.sportit.Adapter;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,16 +11,13 @@ import android.widget.TextView;
 import com.example.android.sportit.Models.Event;
 import com.example.android.sportit.R;
 import android.widget.Filter;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.TimeZone;
 
 import static android.R.attr.filter;
@@ -33,7 +29,6 @@ import static com.facebook.FacebookSdk.getApplicationContext;
 
 public class EventAdapter extends ArrayAdapter<Event> {
 
-    private Context eventContext;
     private ArrayList<Event> filteredData;
     private ArrayList<Event> originalData;
 
@@ -144,7 +139,6 @@ public class EventAdapter extends ArrayAdapter<Event> {
 
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
-             //   Toast.makeText(getApplicationContext(), results.count+ " results found", Toast.LENGTH_SHORT).show();
                 filteredData = (ArrayList<Event>) results.values;
                 notifyDataSetChanged();
                 clear();

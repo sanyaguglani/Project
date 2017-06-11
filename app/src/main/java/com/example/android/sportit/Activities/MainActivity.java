@@ -6,7 +6,8 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.android.sportit.Adapter.FixTabPages;
@@ -62,8 +63,26 @@ public class MainActivity extends AppCompatActivity {
                 }
             }};
     }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
 
-        @Override
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.about:
+                Intent intent = new Intent(this,about.class);
+                startActivity(intent);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    @Override
         protected void onActivityResult(int requestCode, int resultCode, Intent data) {
             super.onActivityResult(requestCode, resultCode, data);
             if (requestCode == RC_SIGN_IN){
@@ -97,10 +116,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.hasChild(userId)){
-                   // Toast.makeText(getApplicationContext(), "User already present", Toast.LENGTH_SHORT).show();
                 }
                 else{
-                   // Toast.makeText(getApplicationContext(), "User not present", Toast.LENGTH_SHORT).show();
                      user =  new User(userName, userEmail);
                     databaseReference.child(userId).setValue(user);
                 }

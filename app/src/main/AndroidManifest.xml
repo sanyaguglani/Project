@@ -43,6 +43,7 @@
             android:label="@string/category_attending" />
         <activity android:name=".Activities.EventDetails"
             android:label="@string/category_createEvent"/>
+        <activity android:name=".Activities.about"></activity>
     </application>
 
 </manifest>
